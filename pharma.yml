@@ -1,0 +1,181 @@
+swagger: "2.0"
+info:
+  title: Pharma Inventory Maanagement API
+  description: A tool to manage the invetory
+  version: 1.0.0
+  termsOfService: Tier 2
+  contact:
+    name: stepsetgo
+host: "app.pharma.com"
+basePath: /api
+securityDefinitions:
+  auth0:
+    type: oauth2
+    description: Authentication with Auth0
+    flow: implicit
+    authorizationUrl: https://pharma.auth0.com
+    scopes: {}
+tags:
+  - name: Inventory
+    description: Collection of APIs for Inventory management
+  - name: Healthcheck
+    description: API to determine the health of the service
+security:
+  - auth0: []
+schemes:
+  - "https"
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /v1/inventory/items:
+    get:
+      tags:
+        - Inventory
+      summary: Fetches a list of all inventory
+      parameters:
+        - in : query
+          name: itemId
+          type: string
+          format: uuid
+          description: a unique id for items
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+              $ref: "#/definitions/InventoryResponse"
+        "401":
+          description: Unauthenticated - User/Client could not be authenticated by the credentials/token passed
+        "403":
+          description: Unauthorized - User/Client does not have necessary permissions for the requested data
+        "500":
+          description: Server or database error
+    post:
+      tags: 
+        - Inventory
+      summary: add inventory items
+      parameters:
+        - in: body
+          name: itemData
+          schema:
+            $ref : "#/definitions/InventoryPost"
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+              $ref: "#/definitions/InventoryResponse"
+        "401":
+          description: Unauthenticated - User/Client could not be authenticated by the credentials/token passed
+        "403":
+          description: Unauthorized - User/Client does not have necessary permissions for the requested data
+        "500":
+          description: Server or database error
+        
+  /v1/inventory/items/{itemId}:
+    delete:
+      tags: 
+        - Inventory
+      summary: Deletes all inventory item
+      parameters:
+        - in : path
+          required: true
+          type: string
+          name: itemId
+          description: a unique id for items
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          description: Unauthenticated - User/Client could not be authenticated by the credentials/token passed
+        "404":
+          description: Not Found - Items not found for the given ItemId
+        "403":
+          description: Unauthorized - User/Client does not have necessary permissions for the requested data
+        "500":
+          description: Server or database error
+    put:
+      tags:
+        - Inventory
+      summary: updates the details of inventory
+      parameters:
+        - in : body
+          name: itemData
+          schema:
+            $ref: "#/definitions/InventoryPost"
+        - in: path
+          name: itemId
+          type: string
+          required: true
+          format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+              $ref: "#/definitions/InventoryResponse"
+        "401":
+          description: Unauthenticated - User/Client could not be authenticated by the credentials/token passed
+        "403":
+          description: Unauthorized - User/Client does not have necessary permissions for the requested data
+        "500":
+          description: Server or database error
+  /v1/livecheck:
+    get:
+      tags:
+        - Healthcheck
+      summary: Performs a healthcheck on the service
+      responses:
+        "200":
+          description: The service is healthy
+          schema:
+            type: object
+
+definitions:
+  ItemDetails:
+    type: object
+    properties:
+      itemId: 
+        type: string
+        format: uuid
+      name: 
+        type: string
+      category:
+        type: string
+      purchasePrice:
+        type: number
+      quantity:
+        type: number
+      sellingPrice:
+        type: number
+      genericName:
+        type: string
+      company:
+        type: string
+      expireDate:
+        type: string
+        
+  InventoryResponse:
+    type: array
+    items: 
+      $ref: "#/definitions/ItemDetails"
+      
+  InventoryPost:
+    type: object
+    properties:
+      name: 
+        type: string
+      category:
+        type: string
+      purchasePrice:
+        type: number
+      quantity:
+        type: number
+      sellingPrice:
+        type: number
+      genericName:
+        type: string
+      company:
+        type: string
+      expireDate:
+        type: string
+        
